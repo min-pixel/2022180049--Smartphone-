@@ -1,5 +1,5 @@
 # 2022180049 -Smartphone-
-
+1차 발표 : https://youtu.be/tXJAH6NHdLA
 ## 게임의 간단한 소개
 
 - **게임 제목:**  
