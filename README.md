@@ -63,7 +63,7 @@
 
 ### 📺 영상 링크
 
-- 🔗 [2차 발표 영상 링크]
+- 🔗 [2차 발표 영상 링크] https://youtu.be/uRwNpzdlLS0
 - 🔗 [현재 README.md 링크][(https://github.com/your-repo-path/README.md)](https://github.com/min-pixel/2022180049--Smartphone-/edit/main/README.md)
 - 🔗 [1차 발표 영상 링크](https://youtu.be/tXJAH6NHdLA)
 - 🔗 [1차 README 링크]
