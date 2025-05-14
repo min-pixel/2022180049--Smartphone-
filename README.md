@@ -59,6 +59,133 @@
 
 ---
 
+## 📢 2차 발표 내용 (README 확장)
+
+### 📺 영상 링크
+
+- 🔗 [2차 발표 영상 링크]
+- 🔗 [현재 README.md 링크][(https://github.com/your-repo-path/README.md)](https://github.com/min-pixel/2022180049--Smartphone-/edit/main/README.md)
+- 🔗 [1차 발표 영상 링크](https://youtu.be/tXJAH6NHdLA)
+- 🔗 [1차 README 링크]
+
+---
+
+### ✅ 기능별 진행 상황
+
+| 기능 항목                              | 진행도 |
+|--------------------------------------|--------|
+| 터치 드래그 기반 캐릭터 이동           | ✅ 100% |
+| 자동 공격 시스템                      | ✅ 100% |
+| 적 생성 / 추적 / 제거                 | ✅ 100% |
+| 일반 적 3종 구현                     | ✅ 100% |
+| 시간이 지날수록 적 증가 시스템         | ✅ 100% |
+| 경험치 획득 및 레벨업                 | ✅ 80%  |
+| 스탯 업그레이드 시스템                | 🔲 0%   |
+| 스탯 확인 UI                          | 🔲 0%   |
+| 게임 타이머 UI                        | ✅ 100% |
+| 체력/경험치바 UI                     | ✅ 100% |
+| 결과 화면 구현 (클리어/오버)         | 🔲 0%   |
+| 보스 몬스터 등장                     | 🔲 0%   |
+
+---
+
+### 📊 주차별 커밋 수
+
+> 아직 커밋 내역 없음
+
+| 주차   | 커밋 수 |
+|--------|---------|
+| 1주차  | 0       |
+| 2주차  | 0       |
+| 3주차  | 0       |
+| 4주차  | 0       |
+| 5주차  | 0       |
+| 6주차  | 0       |
+
+---
+
+### 🧱 MainScene 주요 오브젝트 설명
+
+#### 🎮 Player
+- 이동, 애니메이션, 자동 발사, 체력 및 경험치 보유
+- `updateFire()`로 자동 공격, `decreaseLife()`로 피해 처리
+- **상호작용:** JoyStick 입력을 통해 이동, Enemy와 충돌 시 체력 감소, Bullet 발사
+- **핵심 코드:**  
+  - `update()` – 조이스틱 기반 이동 + 스크롤 요청  
+  - `updateFire()` – 가장 가까운 적에게 자동 공격  
+  - `decreaseLife()` – 체력 감소 및 사망 처리
+  ![player](https://github.com/user-attachments/assets/39185b17-9c81-4cb5-aae9-db14fe180e09)
+
+
+#### 👾 Enemy
+- 적 타입(GREEN / RED / BLACK) 별로 이동 속도와 체력이 다름
+- 일정 간격마다 생성되며, 플레이어를 추적
+- **상호작용:** Bullet과 충돌 시 피격, Player와 충돌 시 체력 감소
+- **핵심 코드:**  
+  - `update()` – 플레이어 방향 추적 및 이동  
+  - `decreaseLife()` – 체력 감소 및 사망 여부 판단
+
+<div align="center">
+  
+![enemy_01](https://github.com/user-attachments/assets/2e5e480c-f6db-41ba-b904-0b4d2cf0c871)  
+![enemy_02](https://github.com/user-attachments/assets/3aab70ae-c7b6-4099-91b6-824cf7de378b)  
+![enemy_03](https://github.com/user-attachments/assets/93ba7dc9-fa72-4bd0-ac0b-1e84efc2f0fd)
+
+</div>
+
+| 타입  | 색상   | 이동 속도 (`speed`) | 체력 (`maxLife`) | 특징          |
+|--------|--------|---------------------|------------------|-----------------|
+| GREEN  | 초록   | 150f (가장 빠름)    | 30               | 다수 등장, 약함 |
+| RED    | 빨강   | 100f (중간 속도)    | 50               | 균형형         |
+| BLACK  | 검정   |  70f (가장 느림)    | 70               | 느리지만 튼튼함 |
+
+
+#### 💥 Bullet
+- 자동 조준 발사 탄환
+- 가장 가까운 적 탐지 후 궤도 조정
+- **상호작용:** Enemy와 충돌 시 피해를 입힘, 화면 밖으로 나가면 제거됨
+- **핵심 코드:**  
+  - `findClosestEnemyOnScreen()` – 발사 방향 결정  
+  - `update()` – 이동 및 화면 밖 처리  
+  ![bullet_01](https://github.com/user-attachments/assets/a33fd17f-1e26-46e0-bac9-9c427cec9a69)
+
+
+#### 🔄 EnemyGenerator
+- 3초마다 적 생성
+- 시간이 지날수록 적 수 증가, 타입 변화
+- **상호작용:** Player 기준 좌표 주변에 적을 배치함
+- **핵심 코드:**  
+  - `generate()` – 시간 경과에 따라 적 수 및 타입 결정  
+  - `update()` – 적 생성 타이머 갱신
+
+
+#### 🧠 CollisionChecker
+- 적과 총알, 적과 플레이어 충돌 처리
+- **상호작용:** Enemy vs Bullet / Enemy vs Player 충돌 감지 및 제거 처리
+- **핵심 코드:**  
+  - `update()` – 충돌 판정 및 체력 감소, 사망 처리
+
+
+#### 🗺️ FollowScrollBackground
+- 고정형 맵 크기: 7200 × 12800  
+- 스크롤링 처리 (플레이어 중심)
+- **상호작용:** Player로부터 스크롤 요청을 받아 배경을 이동시킴
+- **핵심 코드:**  
+  - `requestScrollX/Y()` – 외부에서 스크롤 요청  
+  - `update()` – 현재 스크롤 좌표 갱신  
+  - `draw()` – 맵과 테두리 렌더링
+
+
+#### ⏱ GameTimer / 📊 ExpBar
+- HUD에 경과 시간과 경험치 게이지 출력
+- **상호작용:**  
+  - GameTimer는 EnemyGenerator의 시간 기준으로 사용됨  
+  - ExpBar는 Player의 경험치 상태를 참조
+- **핵심 코드:**  
+  - `GameTimer.getElapsedTime()` – 현재 시간 반환  
+  - `ExpBar.draw()` – 게이지 길이 = `Player.getExpRatio()`
+
+---
 
 
  
