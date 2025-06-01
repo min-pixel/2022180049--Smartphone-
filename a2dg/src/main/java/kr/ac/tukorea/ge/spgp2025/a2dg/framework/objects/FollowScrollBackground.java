@@ -139,7 +139,7 @@ public class FollowScrollBackground implements IGameObject {
         canvas.drawBitmap(fullBitmap, src, dstF, paint);
 
         Log.d("CHECK", "Bitmap size: " + fullBitmap.getWidth() + " x " + fullBitmap.getHeight());
-        Log.d("CHECK", "Screen size: " + Metrics.width + " x " + Metrics.height);
+        //Log.d("CHECK", "Screen size: " + Metrics.width + " x " + Metrics.height);
 
 
     }
