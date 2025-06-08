@@ -42,13 +42,33 @@ public class CollisionChecker implements IGameObject {
             if (CollisionHelper.collides(enemy, player)) {
                 player.decreaseLife(10); // 체력 10 감소 (원하는 값으로 조정)
             }
-            if(CollisionHelper.collides(enemy, enemy)){
-                // 적과 적이 너무 겹치지 않게 적 자바에서 함수를 추가해 처리해볼까.
-            }
-
-
         }
+        // 적들끼리 겹치지 않게 밀어내기
+        for (int i = 0; i < enemies.size(); ++i) {
+            Enemy e1 = (Enemy) enemies.get(i);
+            RectF r1 = e1.getCollisionRect();
 
+            for (int j = i + 1; j < enemies.size(); ++j) {
+                Enemy e2 = (Enemy) enemies.get(j);
+                RectF r2 = e2.getCollisionRect();
+
+                if (RectF.intersects(r1, r2)) {
+                    float dx = e1.getX() - e2.getX();
+                    float dy = e1.getY() - e2.getY();
+                    float dist = (float)Math.sqrt(dx * dx + dy * dy);
+                    if (dist == 0) {
+                        dx = 1; dy = 0; dist = 1;
+                    }
+
+                    float push = 1.5f;
+                    float px = dx / dist * push;
+                    float py = dy / dist * push;
+
+                    e1.move(px, py);
+                    e2.move(-px, -py);
+                }
+            }
+        }
 
 
     }

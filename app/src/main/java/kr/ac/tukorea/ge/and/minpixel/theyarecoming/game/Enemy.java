@@ -137,6 +137,9 @@ public class Enemy extends AnimSprite implements IBoxCollidable, ILayerProvider<
         return this.y;
     }
 
-
+    public void move(float dx, float dy) {
+        this.x += dx;
+        this.y += dy;
+    }
 
 }
