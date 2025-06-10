@@ -60,4 +60,9 @@ public class Metrics {
     public static void concat(Canvas canvas) {
         canvas.concat(transformMatrix);
     }
+
+    public static float size(float units) {
+        return units * GRID_UNIT / 100f;  // 100기준 비율
+    }
+
 }

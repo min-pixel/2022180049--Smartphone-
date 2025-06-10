@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import java.util.Random;
 
 import kr.ac.tukorea.ge.spgp2025.a2dg.framework.interfaces.IGameObject;
+import kr.ac.tukorea.ge.spgp2025.a2dg.framework.objects.FollowScrollBackground;
 import kr.ac.tukorea.ge.spgp2025.a2dg.framework.scene.Scene;
 import kr.ac.tukorea.ge.spgp2025.a2dg.framework.view.GameView;
 
@@ -38,10 +39,14 @@ public class EnemyGenerator implements IGameObject {
 
         for (int i = 0; i < spawnCount; i++) {
             float angle = random.nextFloat() * 360;
-            float distance = 300 + random.nextFloat() * 200;
-            float x = player.getX() + (float)Math.cos(Math.toRadians(angle)) * distance;
-            float y = player.getY() + (float)Math.sin(Math.toRadians(angle)) * distance;
+            float distance = 600 + random.nextFloat() * 200;
 
+
+            float worldPlayerX = player.getX() + FollowScrollBackground.getScrollX();
+            float worldPlayerY = player.getY() + FollowScrollBackground.getScrollY();
+
+            float x = worldPlayerX + (float)Math.cos(Math.toRadians(angle)) * distance;
+            float y = worldPlayerY + (float)Math.sin(Math.toRadians(angle)) * distance;
             //시간에 따라 타입 고정
             EnemyType randomType;
             if (elapsed < 10) {

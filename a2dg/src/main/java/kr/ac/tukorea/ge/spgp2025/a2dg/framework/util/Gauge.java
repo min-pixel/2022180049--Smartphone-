@@ -35,4 +35,9 @@ public class Gauge {
             canvas.drawLine(0, 0, progress, 0, fgPaint);
         }
     }
+    public void setFgColor(int colorResId) {
+        Resources res = GameView.view.getResources();
+        fgPaint.setColor(ResourcesCompat.getColor(res, colorResId, null));
+    }
+
 }

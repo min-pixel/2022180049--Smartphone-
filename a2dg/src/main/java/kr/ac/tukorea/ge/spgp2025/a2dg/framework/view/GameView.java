@@ -49,6 +49,8 @@ public class GameView extends View implements Choreographer.FrameCallback {
     private void init() {
         GameView.view = this;
 
+        setBackgroundColor(0x00000000);
+
         // 실질적 생성자 역할
         scheduleUpdate();
     }

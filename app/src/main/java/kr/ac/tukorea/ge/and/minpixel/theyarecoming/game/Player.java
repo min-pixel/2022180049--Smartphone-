@@ -18,28 +18,59 @@ import kr.ac.tukorea.ge.spgp2025.a2dg.framework.view.Metrics;
 import android.util.Log;
 
 public class Player extends Sprite implements IBoxCollidable, FollowScrollBackground.IScrollTarget{
+
+    public enum StatType {
+        SPEED, POWER, RATE, HP, DEFENSE, AOE, PIERCING, DASH
+    }
     private static final float PLAYER_WIDTH = 150f;
     private static final float PLAYER_HEIGHT = 150f;
     private static final int FRAME_WIDTH = 64;
     private static final int TOTAL_FRAMES = 8;
     private float elapsedTime = 0;
-    private static final float SPEED = 300f;
+
+    // === 스탯 ===
+    private int speedLevel = 0;
+    private int powerLevel = 0;
+    private int rateLevel = 0;
+    private int hpLevel = 0;
+    private int defenseLevel = 0;
+
+    private int aoeLevel = 0;
+    private int piercingLevel = 0;
+
+    private static float SPEED = 300f;     // 기본값
+    private int attackPower = 10;
+    private float fireInterval = 0.5f; // 0.5초마다 발사
+    private int defense = 0;
+    private int life = 100000;
+    private int maxLife = 100000;
+
+    private boolean isDashing = false;
+    private float dashDx, dashDy;
+    private float dashTimer = 0f;
+    private float dashCooldown = 0f;
+
+    private int dashLevel = 0;
+
     private final JoyStick joystick;
     private float targetX;
 
     private final Rect srcRect = new Rect();
 
-    private int life = 100000;
-    private int maxLife = 100000;
+    private static final int GAUGE_COLOR_NORMAL = R.color.player_gauge_fg;
+    private static final int GAUGE_COLOR_DASH = R.color.exp_gauge_fg;
+
     private static final Gauge hpGauge = new Gauge(0.1f, R.color.player_gauge_fg, R.color.player_gauge_bg);
 
-    private float fireInterval = 0.5f; // 0.5초마다 발사
+
     private float fireTime = 0f;
 
     private int exp = 0;
-    private int maxExp = 100;
+    private int maxExp = 10;
 
     private int frameWidth;
+
+
 
 
 
@@ -72,9 +103,27 @@ public class Player extends Sprite implements IBoxCollidable, FollowScrollBackgr
         float dx = (float) Math.cos(joystick.angle_radian) * joystick.power * SPEED;
         float dy = (float) Math.sin(joystick.angle_radian) * joystick.power * SPEED;
 
-        // 맵을 반대 방향으로 스크롤하여 플레이어가 중앙에 고정된 것처럼 보이게
-        FollowScrollBackground.requestScrollX(dx * GameView.frameTime);
-        FollowScrollBackground.requestScrollY(dy * GameView.frameTime);
+        if (!isDashing && dashCooldown <= 0 && joystick.power > 0.95f) {
+            requestDash(-dx, -dy);  // ← 조이스틱 방향 그대로 대시 (스크롤 반영)
+        }
+
+        if (isDashing) {
+            float scrollAmount = getDashDistance() * GameView.frameTime / 0.2f;
+            FollowScrollBackground.requestScrollX(-dashDx * scrollAmount);
+            FollowScrollBackground.requestScrollY(-dashDy * scrollAmount);
+            dashTimer -= GameView.frameTime;
+            if (dashTimer <= 0) {
+                isDashing = false;
+                hpGauge.setFgColor(R.color.player_gauge_fg);
+            }
+        } else {
+            FollowScrollBackground.requestScrollX(dx * GameView.frameTime);
+            FollowScrollBackground.requestScrollY(dy * GameView.frameTime);
+        }
+
+        dashCooldown -= GameView.frameTime;
+        if (dashCooldown < 0) dashCooldown = 0;
+
 
         setPosition(Metrics.width / 2f, Metrics.height / 2f, PLAYER_WIDTH, PLAYER_HEIGHT);
         updateRoll();
@@ -94,7 +143,7 @@ public class Player extends Sprite implements IBoxCollidable, FollowScrollBackgr
         Enemy closest = Bullet.findClosestEnemyOnScreen(x, y);
         if (closest == null) return; // 화면에 적 없으면 발사 안 함
 
-        Bullet bullet = Bullet.get(x, y - radius - 10, 10);
+        Bullet bullet = Bullet.get(x, y - radius - 10, attackPower, getAOELevel(), getPiercingLevel());
         Scene.top().add(bullet);
     }
 
@@ -155,7 +204,15 @@ public class Player extends Sprite implements IBoxCollidable, FollowScrollBackgr
 
     public void addExp(int amount) {
         exp += amount;
-        if (exp > maxExp) exp = maxExp; // 추후 레벨업 확장 가능
+        if (exp > maxExp) {
+            exp = 0;
+            maxExp += 10;
+        }
+        if (exp >= maxExp) {
+            GameView.view.pushScene(new PauseScene(this));
+            return;
+        }
+
     }
     public float getExpRatio() {
         return (float) exp / maxExp;
@@ -167,11 +224,13 @@ public class Player extends Sprite implements IBoxCollidable, FollowScrollBackgr
     }
 
     public void decreaseLife(int amount) {
-        life -= amount;
-        if (life < 0) life = 0;
+        if (isDashing) return;
 
+        int reduced = Math.max(1, amount - defense);
+        life -= reduced;
+        if (life < 0) life = 0;
         if (life <= 0) {
-            onDeath(); // 사망 처리
+            onDeath();
         }
     }
 
@@ -184,4 +243,110 @@ public class Player extends Sprite implements IBoxCollidable, FollowScrollBackgr
     public int getLife() {
         return life;
     }
+
+    public void upgradeSpeed() {
+        if (speedLevel >= 3) return;
+        speedLevel++;
+        SPEED += 50000f;
+    }
+
+    public void upgradePower() {
+        if (powerLevel >= 3) return;
+        powerLevel++;
+        attackPower += 5;
+    }
+
+    public void upgradeRate() {
+        if (rateLevel >= 3) return;
+        rateLevel++;
+        fireInterval *= 0.85f; // 더 빠르게
+    }
+
+    public void upgradeHP() {
+        if (hpLevel >= 3) return;
+        hpLevel++;
+        maxLife += 20;
+        life += 20;
+    }
+
+    public void upgradeDefense() {
+        if (defenseLevel >= 3) return;
+        defenseLevel++;
+        defense += 2;
+    }
+
+    public void upgradeAOE() {
+        if (aoeLevel >= 3) return;
+        aoeLevel++;
+    }
+
+    public void upgradePIERCING() {
+        if (piercingLevel >= 9) return;
+        piercingLevel++;
+    }
+
+    public int getSpeedLevel() {
+        return speedLevel;
+    }
+
+    public int getPowerLevel() {
+        return powerLevel;
+    }
+
+    public int getRateLevel() {
+        return rateLevel;
+    }
+
+    public int getHPLevel() {
+        return hpLevel;
+    }
+
+    public int getDefenseLevel() {
+        return defenseLevel;
+    }
+
+    public int getAOELevel() { return aoeLevel; }
+    public int getPiercingLevel() { return piercingLevel*3; }
+
+    public void requestDash(float dx, float dy) {
+        if (dashCooldown > 0 || isDashing) return;
+
+        hpGauge.setFgColor(R.color.exp_gauge_fg);
+
+        float len = (float) Math.sqrt(dx * dx + dy * dy);
+        if (len < 10f) return;
+
+        dashDx = dx / len;
+        dashDy = dy / len;
+        isDashing = true;
+        dashTimer = 0.2f;
+        dashCooldown = getDashCooldown();
+
+        MainScene scene = (MainScene) Scene.top();
+        scene.add(MainScene.Layer.effect, new DashEffect(Metrics.width / 2, Metrics.height / 2, dashDx, dashDy));
+
+    }
+
+
+    private float getDashDistance() {
+        return 400f + dashLevel * 200f; // Lv0:400, Lv1:600, Lv2:800, Lv3:1000
+    }
+
+    private float getDashCooldown() {
+        return 3.5f - dashLevel * 0.5f; // Lv0:3.5초, Lv1:3.0초, ...
+    }
+
+    public void upgradeDASH() {
+        if (dashLevel >= 3) return;
+        dashLevel++;
+    }
+
+    public int getDashLevel() {
+        return dashLevel;
+    }
+
+    public float getDashCooldownRatio() {
+        return dashCooldown / getDashCooldown(); // 0~1 사이 비율
+    }
+
 }

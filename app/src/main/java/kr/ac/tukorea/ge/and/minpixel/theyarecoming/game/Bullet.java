@@ -2,6 +2,8 @@ package kr.ac.tukorea.ge.and.minpixel.theyarecoming.game;
 
 import android.graphics.RectF;
 
+import java.util.HashSet;
+
 import kr.ac.tukorea.ge.and.minpixel.theyarecoming.R;
 import kr.ac.tukorea.ge.spgp2025.a2dg.framework.interfaces.IBoxCollidable;
 import kr.ac.tukorea.ge.spgp2025.a2dg.framework.interfaces.ILayerProvider;
@@ -16,8 +18,16 @@ public class Bullet extends Sprite implements IRecyclable, IBoxCollidable, ILaye
     private static final float SPEED = 1000f;
     private int power;
 
-    public static Bullet get(float x, float y, int power) {
-        return Scene.top().getRecyclable(Bullet.class).init(x, y, power);
+    private int aoeLevel;
+    private int piercingLevel;
+
+    private final HashSet<Enemy> alreadyHitEnemies = new HashSet<>();
+
+    public static Bullet get(float x, float y, int power, int aoeLevel, int piercingLevel) {
+        Bullet bullet = new Bullet().init(x, y, power);
+        bullet.aoeLevel = aoeLevel;
+        bullet.piercingLevel = piercingLevel;
+        return bullet;
     }
 
     public Bullet() {
@@ -121,4 +131,25 @@ public class Bullet extends Sprite implements IRecyclable, IBoxCollidable, ILaye
     public MainScene.Layer getLayer() {
         return MainScene.Layer.bullet;
     }
+
+    public void explodeAOE() {
+        if (aoeLevel <= 0) return;
+
+        AoeEffect explosion = new AoeEffect(x, y, aoeLevel, power);
+        Scene.top().add(MainScene.Layer.effect, explosion);
+    }
+
+    public boolean decreasePiercingLevel() {
+        piercingLevel--;
+        return piercingLevel <= 0;
+    }
+
+    public boolean alreadyHit(Enemy enemy) {
+        return alreadyHitEnemies.contains(enemy);
+    }
+
+    public void markHit(Enemy enemy) {
+        alreadyHitEnemies.add(enemy);
+    }
+
 }

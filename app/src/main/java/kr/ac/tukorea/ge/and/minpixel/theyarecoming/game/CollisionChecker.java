@@ -27,14 +27,24 @@ public class CollisionChecker implements IGameObject {
             for (int b = bullets.size() - 1; b >= 0; b--) {
                 Bullet bullet = (Bullet) bullets.get(b);
                 if (CollisionHelper.collides(enemy, bullet)) {
-                    scene.remove(MainScene.Layer.bullet, bullet);
+
+                    if (bullet.alreadyHit(enemy)) continue;  // 이미 맞았으면 무시
+
+                    bullet.markHit(enemy); //최초 히트 적 등록
+
+
+                    if (bullet.decreasePiercingLevel()) {
+                        scene.remove(MainScene.Layer.bullet, bullet); // piercingLevel이 0이면 제거
+                    }
+                    bullet.explodeAOE();
                     boolean dead = enemy.decreaseLife(bullet.getPower());
                     if (dead) {
                         scene.remove(MainScene.Layer.enemy, enemy);
                         player.addExp(5);
                         // scene.addScore(enemy.getScore()); // 점수 시스템 있다면 여기서 처리
                     }
-                    break; // 한 총알은 한 적에게만 충돌
+
+
                 }
             }
 
@@ -43,6 +53,26 @@ public class CollisionChecker implements IGameObject {
                 player.decreaseLife(10); // 체력 10 감소 (원하는 값으로 조정)
             }
         }
+
+        /*ArrayList<IGameObject> effects = scene.objectsAt(MainScene.Layer.effect);
+        for (int i = effects.size() - 1; i >= 0; i--) {
+            IGameObject obj = effects.get(i);
+            if (!(obj instanceof AoeEffect)) continue;
+
+            AoeEffect aoe = (AoeEffect) obj;
+
+            for (int j = enemies.size() - 1; j >= 0; j--) {
+                Enemy enemy = (Enemy) enemies.get(j);
+                if (CollisionHelper.collides(enemy, aoe)) {
+                    boolean dead = enemy.decreaseLife(aoe.getDamage());
+                    if (dead) {
+                        scene.remove(MainScene.Layer.enemy, enemy);
+                        player.addExp(5);
+                    }
+                }
+            }
+        }*/
+
         // 적들끼리 겹치지 않게 밀어내기
         for (int i = 0; i < enemies.size(); ++i) {
             Enemy e1 = (Enemy) enemies.get(i);
