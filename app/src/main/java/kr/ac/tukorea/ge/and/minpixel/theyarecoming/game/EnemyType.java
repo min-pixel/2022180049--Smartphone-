@@ -1,5 +1,6 @@
 package kr.ac.tukorea.ge.and.minpixel.theyarecoming.game;
 
 public enum EnemyType {
-    GREEN, RED, BLACK
+    GREEN, RED, BLACK, BOSS
 }
+

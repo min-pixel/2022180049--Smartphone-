@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import kr.ac.tukorea.ge.and.minpixel.theyarecoming.R;
 import kr.ac.tukorea.ge.and.minpixel.theyarecoming.game.MainScene;
+import kr.ac.tukorea.ge.and.minpixel.theyarecoming.game.TitleScene;
 import kr.ac.tukorea.ge.spgp2025.a2dg.framework.view.GameView;
 
 public class MainActivity extends AppCompatActivity {
@@ -20,7 +21,10 @@ public class MainActivity extends AppCompatActivity {
 
         GameView gameView = new GameView(this);
         setContentView(gameView);
-        gameView.pushScene(new MainScene()); // 중요!
+
+        //GameView.view.pushScene(new TitleScene());
+
+        //gameView.pushScene(new MainScene());
 
 
     }

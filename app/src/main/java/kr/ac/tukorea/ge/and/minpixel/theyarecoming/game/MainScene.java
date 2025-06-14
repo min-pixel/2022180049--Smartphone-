@@ -73,7 +73,7 @@ public class MainScene extends Scene {
         add(Layer.player, player);
         add(Layer.ui, new ExpBar(player));
         add(Layer.controller, new CollisionChecker(this, player));
-        add(Layer.controller, new EnemyGenerator(player, gameTimer));
+        add(Layer.controller, new EnemyGenerator(player, gameTimer,mapWidth, mapHeight));
 
         statButton = new StatToggleButton(() -> {
             if (statVisible) {

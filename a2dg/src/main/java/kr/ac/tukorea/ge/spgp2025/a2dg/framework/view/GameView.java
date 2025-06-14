@@ -246,4 +246,8 @@ public class GameView extends View implements Choreographer.FrameCallback {
         canvas.drawText("FPS: " + fps, 80f, 80f, fpsPaint);
         canvas.drawText(count + " " + countsForLayers, 80f, 160f, fpsPaint);
     }
+
+    public int getSceneCount() {
+        return sceneStack.size();
+    }
 }

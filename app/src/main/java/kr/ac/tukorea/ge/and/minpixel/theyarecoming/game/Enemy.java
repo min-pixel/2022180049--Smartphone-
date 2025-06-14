@@ -17,8 +17,8 @@ import kr.ac.tukorea.ge.and.minpixel.theyarecoming.game.EnemyType;
 
 public class Enemy extends AnimSprite implements IBoxCollidable, ILayerProvider<MainScene.Layer> {
     private static final float ENEMY_WIDTH = 150f;
-    private int life = 30;
-    private int maxLife = 30;
+    public int life = 30;
+    public int maxLife = 30;
 
     private final Player target;
     private static final Gauge hpGauge = new Gauge(0.1f, R.color.enemy_gauge_fg, R.color.enemy_gauge_bg);
@@ -28,7 +28,7 @@ public class Enemy extends AnimSprite implements IBoxCollidable, ILayerProvider<
 
 
     public Enemy(Player target, EnemyType type) {
-        super(getImageResId(type), 8);
+        super(getImageResId(type),8);
         this.target = target;
         this.type = type;
         switch (type) {
@@ -41,6 +41,7 @@ public class Enemy extends AnimSprite implements IBoxCollidable, ILayerProvider<
             case BLACK:
                 maxLife = 70;
                 break;
+
         }
         this.life = maxLife;
 
@@ -50,6 +51,7 @@ public class Enemy extends AnimSprite implements IBoxCollidable, ILayerProvider<
         switch (type) {
             case RED: return R.mipmap.enemy_02;
             case BLACK: return R.mipmap.enemy_03;
+            case BOSS: return R.mipmap.boss;
             case GREEN:
             default: return R.mipmap.enemy_01;
         }
@@ -140,6 +142,10 @@ public class Enemy extends AnimSprite implements IBoxCollidable, ILayerProvider<
     public void move(float dx, float dy) {
         this.x += dx;
         this.y += dy;
+    }
+
+    public EnemyType getType() {
+        return this.type;
     }
 
 }

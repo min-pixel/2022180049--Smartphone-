@@ -18,9 +18,16 @@ public class EnemyGenerator implements IGameObject {
 
     private final GameTimer timer;
 
-    public EnemyGenerator(Player player, GameTimer timer) {
+    private final float mapWidth;
+    private final float mapHeight;
+
+    private boolean bossSpawned = false;
+
+    public EnemyGenerator(Player player, GameTimer timer, float mapWidth, float mapHeight) {
         this.player = player;
         this.timer = timer;
+        this.mapWidth = mapWidth;
+        this.mapHeight = mapHeight;
     }
 
     @Override
@@ -30,6 +37,19 @@ public class EnemyGenerator implements IGameObject {
             generate();
             enemyTime = GEN_INTERVAL;
         }
+
+        if (!bossSpawned && timer.getElapsedTime() > 60) {
+            // 월드 좌표 기준 북쪽 중앙
+            float y = 1000f / 2f;
+            float x = 1000f;
+
+            BossEnemy boss = new BossEnemy(player, mapWidth, mapHeight);
+            boss.setPosition(x, y, 200); // 보스 크기
+
+            Scene.top().add(boss);
+            bossSpawned = true;
+        }
+
     }
 
     private void generate() {
@@ -61,6 +81,9 @@ public class EnemyGenerator implements IGameObject {
             enemy.setPosition(x, y, 100);
             Scene.top().add(enemy);
         }
+
+
+
     }
 
     @Override

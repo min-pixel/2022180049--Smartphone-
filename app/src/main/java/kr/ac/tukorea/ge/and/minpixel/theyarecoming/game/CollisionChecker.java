@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import kr.ac.tukorea.ge.spgp2025.a2dg.framework.interfaces.IGameObject;
 import kr.ac.tukorea.ge.spgp2025.a2dg.framework.interfaces.IBoxCollidable;
 import kr.ac.tukorea.ge.spgp2025.a2dg.framework.util.CollisionHelper;
-
+import kr.ac.tukorea.ge.spgp2025.a2dg.framework.scene.Scene;
 
 public class CollisionChecker implements IGameObject {
     private final MainScene scene;
@@ -51,27 +51,11 @@ public class CollisionChecker implements IGameObject {
             // 적과 플레이어 충돌
             if (CollisionHelper.collides(enemy, player)) {
                 player.decreaseLife(10); // 체력 10 감소 (원하는 값으로 조정)
+
             }
         }
 
-        /*ArrayList<IGameObject> effects = scene.objectsAt(MainScene.Layer.effect);
-        for (int i = effects.size() - 1; i >= 0; i--) {
-            IGameObject obj = effects.get(i);
-            if (!(obj instanceof AoeEffect)) continue;
 
-            AoeEffect aoe = (AoeEffect) obj;
-
-            for (int j = enemies.size() - 1; j >= 0; j--) {
-                Enemy enemy = (Enemy) enemies.get(j);
-                if (CollisionHelper.collides(enemy, aoe)) {
-                    boolean dead = enemy.decreaseLife(aoe.getDamage());
-                    if (dead) {
-                        scene.remove(MainScene.Layer.enemy, enemy);
-                        player.addExp(5);
-                    }
-                }
-            }
-        }*/
 
         // 적들끼리 겹치지 않게 밀어내기
         for (int i = 0; i < enemies.size(); ++i) {
@@ -83,6 +67,18 @@ public class CollisionChecker implements IGameObject {
                 RectF r2 = e2.getCollisionRect();
 
                 if (RectF.intersects(r1, r2)) {
+                    // 보스와 일반 적 충돌 처리
+                    if (e1.getType() == EnemyType.BOSS && e2.getType() != EnemyType.BOSS) {
+                        scene.remove(MainScene.Layer.enemy, e2);
+                        ((BossEnemy)e1).increaseLife(10);  // 회복량 조정 가능
+                        continue;
+                    }
+                    if (e2.getType() == EnemyType.BOSS && e1.getType() != EnemyType.BOSS) {
+                        scene.remove(MainScene.Layer.enemy, e1);
+                        ((BossEnemy)e2).increaseLife(10);
+                        continue;
+                    }
+
                     float dx = e1.getX() - e2.getX();
                     float dy = e1.getY() - e2.getY();
                     float dist = (float)Math.sqrt(dx * dx + dy * dy);

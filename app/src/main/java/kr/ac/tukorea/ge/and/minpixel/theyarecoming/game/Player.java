@@ -39,11 +39,11 @@ public class Player extends Sprite implements IBoxCollidable, FollowScrollBackgr
     private int piercingLevel = 0;
 
     private static float SPEED = 300f;     // 기본값
-    private int attackPower = 10;
+    private int attackPower = 20;
     private float fireInterval = 0.5f; // 0.5초마다 발사
     private int defense = 0;
-    private int life = 100000;
-    private int maxLife = 100000;
+    private int life = 1000;
+    private int maxLife = 1000;
 
     private boolean isDashing = false;
     private float dashDx, dashDy;
@@ -103,7 +103,7 @@ public class Player extends Sprite implements IBoxCollidable, FollowScrollBackgr
         float dx = (float) Math.cos(joystick.angle_radian) * joystick.power * SPEED;
         float dy = (float) Math.sin(joystick.angle_radian) * joystick.power * SPEED;
 
-        if (!isDashing && dashCooldown <= 0 && joystick.power > 0.95f) {
+        if (!isDashing && dashCooldown <= 0 && joystick.power >= 1.f) {
             requestDash(-dx, -dy);  // ← 조이스틱 방향 그대로 대시 (스크롤 반영)
         }
 
@@ -236,8 +236,7 @@ public class Player extends Sprite implements IBoxCollidable, FollowScrollBackgr
 
     private void onDeath() {
         // 앱 종료 처리
-        android.os.Process.killProcess(android.os.Process.myPid());
-        System.exit(1);
+        GameView.view.pushScene(new GameOverScene());
     }
 
     public int getLife() {
@@ -245,43 +244,43 @@ public class Player extends Sprite implements IBoxCollidable, FollowScrollBackgr
     }
 
     public void upgradeSpeed() {
-        if (speedLevel >= 3) return;
+        //if (speedLevel >= 3) return;
         speedLevel++;
-        SPEED += 50000f;
+        SPEED += 5f;
     }
 
     public void upgradePower() {
-        if (powerLevel >= 3) return;
+        //if (powerLevel >= 3) return;
         powerLevel++;
         attackPower += 5;
     }
 
     public void upgradeRate() {
-        if (rateLevel >= 3) return;
+        //if (rateLevel >= 3) return;
         rateLevel++;
         fireInterval *= 0.85f; // 더 빠르게
     }
 
     public void upgradeHP() {
-        if (hpLevel >= 3) return;
+        //if (hpLevel >= 3) return;
         hpLevel++;
-        maxLife += 20;
-        life += 20;
+        maxLife += 200;
+        life = maxLife;
     }
 
     public void upgradeDefense() {
-        if (defenseLevel >= 3) return;
+        //if (defenseLevel >= 3) return;
         defenseLevel++;
         defense += 2;
     }
 
     public void upgradeAOE() {
-        if (aoeLevel >= 3) return;
+        //if (aoeLevel >= 3) return;
         aoeLevel++;
     }
 
     public void upgradePIERCING() {
-        if (piercingLevel >= 9) return;
+        //if (piercingLevel >= 9) return;
         piercingLevel++;
     }
 
@@ -299,6 +298,11 @@ public class Player extends Sprite implements IBoxCollidable, FollowScrollBackgr
 
     public int getHPLevel() {
         return hpLevel;
+    }
+
+
+    public boolean isDead() {
+        return life <= 0;
     }
 
     public int getDefenseLevel() {
@@ -349,4 +353,19 @@ public class Player extends Sprite implements IBoxCollidable, FollowScrollBackgr
         return dashCooldown / getDashCooldown(); // 0~1 사이 비율
     }
 
+    public float getWidth() {
+        return this.width;
+    }
+
+    public float getHeight() {
+        return this.height;
+    }
+
+    public float getWorldX() {
+        return x + FollowScrollBackground.getScrollX();
+    }
+
+    public float getWorldY() {
+        return y + FollowScrollBackground.getScrollY();
+    }
 }
