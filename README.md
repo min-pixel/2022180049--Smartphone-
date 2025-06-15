@@ -107,6 +107,7 @@
 | 10주차  | 1       |
 | 11주차  | 1       |
 
+![image](https://github.com/user-attachments/assets/7bddab92-3a3c-4d63-a6f3-f3763bfbe704)
 
 ---
 
