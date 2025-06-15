@@ -258,6 +258,11 @@
 ![boss](https://github.com/user-attachments/assets/4821419b-18a3-4c08-9376-17e7656dca85)
 
 
+#### 사용된 기술
+ - 객체 풀링 시스템 활용 (BitmapPool, IRecyclable)
+ - 배경 스크롤 시스템 구현 (FollowScrollBackground)
+
+
 #### 수업에서 차용한 것
 수업에서 제작한 프레임워크 구조 활용
 (Scene 구조, GameObject 인터페이스, GameView, JoyStick, Gauge 등)
