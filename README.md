@@ -174,6 +174,7 @@
   - `requestScrollX/Y()` – 외부에서 스크롤 요청  
   - `update()` – 현재 스크롤 좌표 갱신  
   - `draw()` – 맵과 테두리 렌더링
+![background](https://github.com/user-attachments/assets/e1b3d0ef-68c0-41c6-85b3-deba4b3431f7)
 
 
 #### ⏱ GameTimer / 📊 ExpBar
@@ -184,6 +185,69 @@
 - **핵심 코드:**  
   - `GameTimer.getElapsedTime()` – 현재 시간 반환  
   - `ExpBar.draw()` – 게이지 길이 = `Player.getExpRatio()`
+
+
+#### 관통 스킬
+- 여러 적을 **관통**하는 스킬
+- 단, **같은 적을 두 번 이상 타격하지 않도록 중복 충돌 방지 처리**
+- **상호작용:** 여러 Enemy를 순차적으로 타격하되, 한 적은 한 번만 데미지를 받음  
+- **핵심 코드:**  
+  - `Bullet.update()` – 충돌한 적을 기록하고 중복 데미지 방지  
+  - `bullet.alreadyHit(enemy)` – 이미 맞은 적은 무시
+
+
+#### 광역 스킬
+- 짧은 시간 동안 보여지는 **범위형 이펙트 스킬**
+- 탄환이 범위 내 적들에게 데미지를 입힘
+- **상호작용:** 효과 범위 안에 있는 모든 Enemy에게 단일 타격 적용  
+- **핵심 코드:**  
+  - `AoeEffect.update()` – 프레임 애니메이션 처리 및 `hasDamaged` 조건 확인  
+  - 적 탐색 후 `CollisionHelper.collides(this, enemy)`로 충돌 감지  
+  - 충돌한 적에게 `enemy.decreaseLife(getDamage())` 호출
+  ![aoef](https://github.com/user-attachments/assets/b6579fea-2ef4-4037-90d7-a1cc005aba7c)
+
+
+#### 대쉬 스킬
+- 플레이어가 **조이스틱 방향으로 빠르게 돌진**하며 **데미지를 무시하는 스킬**
+- 일정 시간 동안 시각적 이펙트와 함께 무적 상태 
+- **상호작용:** 돌진 경로에 Enemy가 있어도 데미지를 입지 않음
+- **핵심 코드:**  
+  - `MainScene`에서 `Player`와 `JoyStick` 연동
+![dash](https://github.com/user-attachments/assets/9fbcd0f0-46ac-40e2-80b4-19d54a2369c7)
+
+
+#### 업그레이드 선택 기능
+- 레벨업 시 무작위 3개 중 1개를 선택하는 시스템
+- 선택된 업그레이드는 스킬 추가 또는 스탯 강화로 연결됨
+- 상호작용: Player가 경험치를 통해 레벨업하면 업그레이드 UI 등장 → 터치로 1개 선택
+- **핵심 코드:**
+  - applyUpgrade() - 업그레이드 처리
+  - PauseScene	게임 일시정지 및 업그레이드 선택 화면 표시
+  - UpgradeButton	업그레이드 항목 하나를 UI 버튼으로 표현
+
+
+ #### 보스 몬스터
+- 일정 시간이 지나면 등장하는 강력한 적 유닛
+- 일반 몬스터와는 다른 전용 AI 및 체력/크기/공격 기술을 가짐
+- 상호작용: 보스는 다른 적과 충돌 시, 그 적을 제거하고 자신의 체력을 회복
+            플레이어와 충돌 시 데미지를 입힘
+- **핵심 코드:**
+  - BossEnemy.java – Enemy를 상속받아 보스 전용 속성 정의
+  - CollisionChecker.java – 보스와 적 몬스터 충돌 시, getType() == BOSS 조건으로 흡수 처리
+  - useSpecialSkill() - 보스의 돌진 공격 정의
+![boss](https://github.com/user-attachments/assets/4821419b-18a3-4c08-9376-17e7656dca85)
+
+
+#### 수업에서 차용한 것
+수업에서 제작한 프레임워크 구조 활용
+(Scene 구조, GameObject 인터페이스, GameView, JoyStick, Gauge 등)
+
+#### 아쉬운 점
+ - 대쉬 스킬의 조작감이 만족스럽지 않아 보완하고 싶었지만, 시간 관계상 마무리하지 못함
+ - 게임에 사운드 효과와 배경음악을 추가하고 싶었지만 구현하지 못함
+
+#### 수업에 대한 소감
+ - 객체 간 충돌 처리, 씬 전환, UI 구성 등 실제 게임 구조를 체계적으로 학습한 점이 유익했음
 
 ---
 
